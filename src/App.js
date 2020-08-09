@@ -3,6 +3,8 @@ import Particles from 'react-particles-js';
 import { Navigation, Logo, ImageLinkForm, Rank, FaceRecognition, SignIn, Register } from './components';
 import './App.css';
 
+export const APP_URL = process.env === 'production' ? 'https://ancient-thicket-16168.herokuapp.com' : 'http://localhost:3000'
+
 const particlesOptions = {
   particles: {
     number: {
@@ -60,7 +62,7 @@ class App extends Component {
   onButtonSubmit = () => {
     this.setState({ imageURL: this.state.input });
 
-    fetch('https://ancient-thicket-16168.herokuapp.com/imageurl', {
+    fetch(`${APP_URL}/imageurl`, {
       method: 'post',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
@@ -70,7 +72,7 @@ class App extends Component {
       .then(response => response.json())
       .then(response => {
         if (response) {
-          fetch('https://ancient-thicket-16168.herokuapp.com/image', {
+          fetch(`${APP_URL}/image`, {
             method: 'put',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({

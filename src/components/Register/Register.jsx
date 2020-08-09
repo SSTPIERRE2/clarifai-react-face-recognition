@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 // eslint-disable-next-line
 import tachyons from 'tachyons';
+import { APP_URL } from '../../App';
 
 class Register extends Component {
   constructor(props) {
@@ -27,7 +28,7 @@ class Register extends Component {
   onSubmitSignIn = () => {
     const { name, email, password } = this.state;
 
-    fetch('https://ancient-thicket-16168.herokuapp.com/register', {
+    fetch(`${APP_URL}/register`, {
       method: 'post',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
