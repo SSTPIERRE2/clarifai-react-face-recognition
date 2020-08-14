@@ -1,5 +1,6 @@
 import React from 'react';
 import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import { makeTokenHeaders } from '../../utils/user';
 
 class ProfileIcon extends React.Component {
     constructor(props) {
@@ -14,6 +15,21 @@ class ProfileIcon extends React.Component {
         this.setState(prevState => ({
             dropdownOpen: !prevState.dropdownOpen
         }));
+    }
+
+    signOut = () => {
+        const token = window.sessionStorage.getItem('token');
+
+        fetch('http://localhost:3000/signout', {
+            method: 'post',
+            headers: makeTokenHeaders(token)
+        })
+            .then(resp => resp.json())
+            .then(() => {
+                this.props.onRouteChange('signout');
+                window.sessionStorage.removeItem('token');
+            })
+            .catch(console.log)
     }
 
     render() {
@@ -44,7 +60,7 @@ class ProfileIcon extends React.Component {
                             View Profile
                         </DropdownItem>
                         <DropdownItem 
-                            onClick={() => this.props.onRouteChange('signout')}
+                            onClick={this.signOut}
                         >
                             Sign Out
                         </DropdownItem>

@@ -21,7 +21,8 @@ class SignIn extends Component {
     this.setState({ signInPassword: event.target.value });
   }
 
-  onSubmitSignIn = () => {
+  onSubmitSignIn = (e) => {
+    e.preventDefault();
     const { signInEmail, signInPassword } = this.state;
 
     fetch(`${APP_URL}/signin`, {
@@ -32,7 +33,9 @@ class SignIn extends Component {
         password: signInPassword
       })
     })
-      .then(response => response.json())
+      .then(response => {
+        return response.json();
+      })
       .then(data => {
         if (data.userId && data.success === 'true') {
           saveAuthTokenInSession(data.token);
@@ -43,6 +46,8 @@ class SignIn extends Component {
         console.log(error);
         this.setState({ loginError: 'Yikes! Network error.' });
       });
+
+    return false;
   }
 
   render() {

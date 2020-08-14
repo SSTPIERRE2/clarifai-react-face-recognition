@@ -15,4 +15,5 @@ export const getLoadAuthenticatedUser = (id, token, loadUser, routeChange) => {
                 routeChange('home');
             }
         })
+        .catch(console.log)
 }

@@ -42,22 +42,20 @@ class App extends Component {
   constructor() {
     super();
     this.state = initialState;
-    this.token = window.sessionStorage.getItem('token');
-    console.log(`got token ? `, this.token);
   }
 
   componentDidMount() {
-    // const token = window.sessionStorage.getItem('token');
+    const token = window.sessionStorage.getItem('token');
 
-    if (this.token) {
+    if (token) {
       fetch('http://localhost:3000/signin', {
         method: 'post',
-        headers: makeTokenHeaders(this.token)
+        headers: makeTokenHeaders(token)
       })
         .then(resp => resp.json())
         .then(data => {
           if (data && data.id) {
-            getLoadAuthenticatedUser(data.id, this.token, this.loadUser, this.onRouteChange)
+            getLoadAuthenticatedUser(data.id, token, this.loadUser, this.onRouteChange)
           }
         })
         .catch(console.log)
@@ -90,11 +88,12 @@ class App extends Component {
   }
 
   onButtonSubmit = () => {
+    const token = window.sessionStorage.getItem('token');
     this.setState({ imageURL: this.state.input });
 
     fetch(`${APP_URL}/imageurl`, {
       method: 'post',
-      headers: makeTokenHeaders(this.token),
+      headers: makeTokenHeaders(token),
       body: JSON.stringify({
         input: this.state.input
       })
@@ -104,7 +103,7 @@ class App extends Component {
         if (response) {
           fetch(`${APP_URL}/image`, {
             method: 'put',
-            headers: makeTokenHeaders(this.token),
+            headers: makeTokenHeaders(token),
             body: JSON.stringify({
               id: this.state.user.id
             })
@@ -136,7 +135,6 @@ class App extends Component {
   }
 
   loadUser = (data) => {
-    console.log(`loaded user`, data);
     this.setState({
       user: {
         ...data
