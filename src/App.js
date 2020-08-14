@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import Particles from 'react-particles-js';
 import { Navigation, Logo, ImageLinkForm, Rank, FaceRecognition, SignIn, Register } from './components';
 import './App.css';
+import Modal from './components/Modal/Modal';
+import Profile from './components/Profile/Profile';
+import { getLoadAuthenticatedUser, makeTokenHeaders } from './utils/user';
 
 export const APP_URL = process.env === 'production' ? 'https://ancient-thicket-16168.herokuapp.com' : 'http://localhost:3000'
 
@@ -16,18 +19,22 @@ const particlesOptions = {
     }
   }
 };
+
 const initialState = {
   input: '',
   imageURL: '',
   box: {},
   route: 'signin',
   isSignedIn: false,
+  isProfileOpen: false,
   user: {
     id: '',
     name: '',
     email: '',
     entries: 0,
     joined: '',
+    age: '',
+    pet: ''
   }
 };
 
@@ -35,20 +42,43 @@ class App extends Component {
   constructor() {
     super();
     this.state = initialState;
+    this.token = window.sessionStorage.getItem('token');
+    console.log(`got token ? `, this.token);
+  }
+
+  componentDidMount() {
+    // const token = window.sessionStorage.getItem('token');
+
+    if (this.token) {
+      fetch('http://localhost:3000/signin', {
+        method: 'post',
+        headers: makeTokenHeaders(this.token)
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data && data.id) {
+            getLoadAuthenticatedUser(data.id, this.token, this.loadUser, this.onRouteChange)
+          }
+        })
+        .catch(console.log)
+    }
   }
 
   calculateFaceLocation = (data) => {
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-    const image = document.getElementById('inputImage');
-    const width = Number(image.width);
-    const height = Number(image.height);
-
-    return {
-      leftCol: clarifaiFace.left_col * width,
-      topRow: clarifaiFace.top_row * height,
-      rightCol: width - (clarifaiFace.right_col * width),
-      bottomRow: height - (clarifaiFace.bottom_row * height)
+    if (data && data.outputs) {
+      const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+      const image = document.getElementById('inputImage');
+      const width = Number(image.width);
+      const height = Number(image.height);
+  
+      return {
+        leftCol: clarifaiFace.left_col * width,
+        topRow: clarifaiFace.top_row * height,
+        rightCol: width - (clarifaiFace.right_col * width),
+        bottomRow: height - (clarifaiFace.bottom_row * height)
+      }
     }
+    return {};
   };
 
   displayFaceBox = (box) => {
@@ -64,7 +94,7 @@ class App extends Component {
 
     fetch(`${APP_URL}/imageurl`, {
       method: 'post',
-      headers: {'Content-Type': 'application/json'},
+      headers: makeTokenHeaders(this.token),
       body: JSON.stringify({
         input: this.state.input
       })
@@ -74,7 +104,7 @@ class App extends Component {
         if (response) {
           fetch(`${APP_URL}/image`, {
             method: 'put',
-            headers: {'Content-Type': 'application/json'},
+            headers: makeTokenHeaders(this.token),
             body: JSON.stringify({
               id: this.state.user.id
             })
@@ -97,7 +127,7 @@ class App extends Component {
 
   onRouteChange = (route) => {
     if (route === 'signout') {
-      this.setState(initialState);  
+      return this.setState(initialState);  
     } else if (route ==='home') {
       this.setState({ isSignedIn: true });
     }
@@ -106,24 +136,41 @@ class App extends Component {
   }
 
   loadUser = (data) => {
+    console.log(`loaded user`, data);
     this.setState({
       user: {
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        entries: data.entries,
-        joined: data.joined,
+        ...data
       }
     })
   }
 
+  toggleModal = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      isProfileOpen: !prevState.isProfileOpen
+    }));
+  }
+
   render() {
-    const { isSignedIn, imageURL, route, box } = this.state;
+    const { isSignedIn, imageURL, route, box, isProfileOpen, user } = this.state;
 
     return (
       <div className="App">
         <Particles className='particles' params={particlesOptions} />
-        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
+        <Navigation 
+          isSignedIn={isSignedIn} 
+          onRouteChange={this.onRouteChange}
+          toggleModal={this.toggleModal}
+        />
+        {isProfileOpen && (
+          <Modal>
+            <Profile 
+              toggleModal={this.toggleModal}
+              user={user}
+              loadUser={this.loadUser}
+            />
+          </Modal>
+        )}
         {route === 'home'
           ? <div>
               <Logo />
