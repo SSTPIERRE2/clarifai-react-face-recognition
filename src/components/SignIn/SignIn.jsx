@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import './Signin.css'
-import { APP_URL } from '../../App';
 import { getLoadAuthenticatedUser } from '../../utils/user';
 import { saveAuthTokenInSession } from '../../utils/session';
+import { apiRequest } from '../../utils/api';
 
 class SignIn extends Component {
   constructor(props) {
@@ -25,13 +25,9 @@ class SignIn extends Component {
     e.preventDefault();
     const { signInEmail, signInPassword } = this.state;
 
-    fetch(`${APP_URL}/signin`, {
-      method: 'post',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        email: signInEmail,
-        password: signInPassword
-      })
+    apiRequest(`signin`, 'post', null, {
+      email: signInEmail,
+      password: signInPassword
     })
       .then(response => {
         return response.json();

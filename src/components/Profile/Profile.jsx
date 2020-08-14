@@ -1,6 +1,6 @@
 import React from 'react';
 import './Profile.css';
-import { makeTokenHeaders } from '../../utils/user';
+import { apiRequest } from '../../utils/api';
 
 class Profile extends React.Component {
     constructor(props) {
@@ -31,18 +31,15 @@ class Profile extends React.Component {
     }
 
     onProfileUpdate = (data) => {
-        console.log(`onProfileUpdate`, data);
-        fetch(`http://localhost:3000/profile/${this.props.user.id}`, {
-            method: 'post',
-            headers: makeTokenHeaders(window.sessionStorage.getItem('token')),
-            body: JSON.stringify({ formInput: data })
-        }).then(resp => {
-            console.log(`profile has been updated in db`, resp);
-            if (resp.status === 200 || resp.status === 304) {
-                this.props.toggleModal();
-                this.props.loadUser({ ...this.props.user, ...data });
-            }
-        }).catch(console.log)
+        apiRequest(`profile/${this.props.user.id}`, 'post', window.sessionStorage.getItem('token'), { formInput: data })
+            .then(resp => {
+                console.log(`profile has been updated in db`, resp);
+                if (resp.status === 200 || resp.status === 304) {
+                    this.props.toggleModal();
+                    this.props.loadUser({ ...this.props.user, ...data });
+                }
+            })
+            .catch(console.log)
     }
 
     render() {

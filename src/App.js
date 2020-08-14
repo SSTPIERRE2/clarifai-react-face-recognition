@@ -4,9 +4,8 @@ import { Navigation, Logo, ImageLinkForm, Rank, FaceRecognition, SignIn, Registe
 import './App.css';
 import Modal from './components/Modal/Modal';
 import Profile from './components/Profile/Profile';
-import { getLoadAuthenticatedUser, makeTokenHeaders } from './utils/user';
-
-export const APP_URL = process.env === 'production' ? 'https://ancient-thicket-16168.herokuapp.com' : 'http://localhost:3000'
+import { getLoadAuthenticatedUser } from './utils/user';
+import { apiRequest } from './utils/api';
 
 const particlesOptions = {
   particles: {
@@ -48,10 +47,7 @@ class App extends Component {
     const token = window.sessionStorage.getItem('token');
 
     if (token) {
-      fetch('http://localhost:3000/signin', {
-        method: 'post',
-        headers: makeTokenHeaders(token)
-      })
+      apiRequest(`signin`, 'post', token)
         .then(resp => resp.json())
         .then(data => {
           if (data && data.id) {
@@ -91,22 +87,14 @@ class App extends Component {
     const token = window.sessionStorage.getItem('token');
     this.setState({ imageURL: this.state.input });
 
-    fetch(`${APP_URL}/imageurl`, {
-      method: 'post',
-      headers: makeTokenHeaders(token),
-      body: JSON.stringify({
-        input: this.state.input
-      })
+    apiRequest(`imageurl`, 'post', token, {
+      input: this.state.input
     })
       .then(response => response.json())
       .then(response => {
         if (response) {
-          fetch(`${APP_URL}/image`, {
-            method: 'put',
-            headers: makeTokenHeaders(token),
-            body: JSON.stringify({
-              id: this.state.user.id
-            })
+          apiRequest(`image`, 'put', token, {
+            id: this.state.user.id
           })
             .then(response => response.json())
             .then(count => {

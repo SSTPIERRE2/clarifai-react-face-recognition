@@ -1,13 +1,19 @@
-export const makeTokenHeaders = (token) => ({
-    'Content-Type': 'application/json',
-    'Authorization': token
-});
+import { apiRequest } from "./api";
+
+export const makeTokenHeaders = (token) => {
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+
+    if (token) {
+        headers['Authorization'] = token;
+    }
+
+    return headers;
+};
 
 export const getLoadAuthenticatedUser = (id, token, loadUser, routeChange) => {
-    fetch(`http://localhost:3000/profile/${id}`, {
-        method: 'get',
-        headers: makeTokenHeaders(token)
-    })
+    apiRequest(`profile/${id}`, 'get', token)
         .then(resp => resp.json())
         .then(user => {
             if (user && user.email) {

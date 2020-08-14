@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-import { makeTokenHeaders } from '../../utils/user';
+import { apiRequest } from '../../utils/api';
 
 class ProfileIcon extends React.Component {
     constructor(props) {
@@ -18,12 +18,7 @@ class ProfileIcon extends React.Component {
     }
 
     signOut = () => {
-        const token = window.sessionStorage.getItem('token');
-
-        fetch('http://localhost:3000/signout', {
-            method: 'post',
-            headers: makeTokenHeaders(token)
-        })
+        apiRequest('signout', 'post', window.sessionStorage.getItem('token'))
             .then(resp => resp.json())
             .then(() => {
                 this.props.onRouteChange('signout');
