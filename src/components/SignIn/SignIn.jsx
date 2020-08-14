@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './Signin.css'
 import { APP_URL } from '../../App';
 import { getLoadAuthenticatedUser } from '../../utils/user';
+import { saveAuthTokenInSession } from '../../utils/session';
 
 class SignIn extends Component {
   constructor(props) {
@@ -20,10 +21,6 @@ class SignIn extends Component {
     this.setState({ signInPassword: event.target.value });
   }
 
-  saveAuthTokenInSession = (token) => {
-    window.sessionStorage.setItem('token', token);
-  }
-
   onSubmitSignIn = () => {
     const { signInEmail, signInPassword } = this.state;
 
@@ -38,7 +35,7 @@ class SignIn extends Component {
       .then(response => response.json())
       .then(data => {
         if (data.userId && data.success === 'true') {
-          this.saveAuthTokenInSession(data.token);
+          saveAuthTokenInSession(data.token);
           getLoadAuthenticatedUser(data.userId, data.token, this.props.loadUser, this.props.onRouteChange)
         }
       })
