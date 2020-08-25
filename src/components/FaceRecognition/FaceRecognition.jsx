@@ -3,14 +3,17 @@ import React from 'react';
 import tachyons from 'tachyons';
 import './FaceRecognition.css';
 
-const FaceRecognition = ({ imageURL, box }) => (
+const FaceRecognition = ({ imageURL, boxes = [] }) => (
   <div className='center ma'>
     <div className='absolute mt2'>
       <img alt='' id='inputImage' src={imageURL} width='500px' height='auto' />
-      <div 
-        className='bounding-box' 
-        style={{ top: box.topRow, left: box.leftCol, right: box.rightCol, bottom: box.bottomRow}} 
-      />
+      {boxes.map(box => (
+        <div
+          key={box.id}
+          className='bounding-box' 
+          style={{ top: box.topRow, left: box.leftCol, right: box.rightCol, bottom: box.bottomRow}} 
+        />
+      ))}
     </div>
   </div>
 );

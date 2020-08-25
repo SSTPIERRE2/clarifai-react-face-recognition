@@ -10,11 +10,9 @@ class Profile extends React.Component {
             age: this.props.user.age,
             pet: this.props.user.pet
         }
-        console.log(`profile`, this.props.user);
     }
 
     onFormChange = (event) => {
-        // console.log(`onFormChange`, event, event.target.name);
         switch(event.target.name) {
             case 'userName':
                 this.setState({ name: event.target.value });
@@ -33,7 +31,6 @@ class Profile extends React.Component {
     onProfileUpdate = (data) => {
         apiRequest(`profile/${this.props.user.id}`, 'post', window.sessionStorage.getItem('token'), { formInput: data })
             .then(resp => {
-                console.log(`profile has been updated in db`, resp);
                 if (resp.status === 200 || resp.status === 304) {
                     this.props.toggleModal();
                     this.props.loadUser({ ...this.props.user, ...data });

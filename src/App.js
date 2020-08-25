@@ -22,7 +22,7 @@ const particlesOptions = {
 const initialState = {
   input: '',
   imageURL: '',
-  box: {},
+  boxes: [],
   route: 'signin',
   isSignedIn: false,
   isProfileOpen: false,
@@ -60,23 +60,26 @@ class App extends Component {
 
   calculateFaceLocation = (data) => {
     if (data && data.outputs) {
-      const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-      const image = document.getElementById('inputImage');
-      const width = Number(image.width);
-      const height = Number(image.height);
-  
-      return {
-        leftCol: clarifaiFace.left_col * width,
-        topRow: clarifaiFace.top_row * height,
-        rightCol: width - (clarifaiFace.right_col * width),
-        bottomRow: height - (clarifaiFace.bottom_row * height)
-      }
+      return data.outputs[0].data.regions.map(region => {
+        const clarifaiFace = region.region_info.bounding_box;
+        const image = document.getElementById('inputImage');
+        const width = Number(image.width);
+        const height = Number(image.height);
+    
+        return {
+          id: region.id,
+          leftCol: clarifaiFace.left_col * width,
+          topRow: clarifaiFace.top_row * height,
+          rightCol: width - (clarifaiFace.right_col * width),
+          bottomRow: height - (clarifaiFace.bottom_row * height)
+        }
+      });
     }
-    return {};
+    return [];
   };
 
-  displayFaceBox = (box) => {
-    this.setState({ box });
+  displayFaceBox = (boxes) => {
+    this.setState({ boxes });
   }
 
   onInputChange = (event) => {
@@ -138,7 +141,7 @@ class App extends Component {
   }
 
   render() {
-    const { isSignedIn, imageURL, route, box, isProfileOpen, user } = this.state;
+    const { isSignedIn, imageURL, route, boxes, isProfileOpen, user } = this.state;
 
     return (
       <div className="App">
@@ -167,7 +170,7 @@ class App extends Component {
               />
               <FaceRecognition 
                 imageURL={imageURL} 
-                box={box} 
+                boxes={boxes} 
               />
             </div>
           : (

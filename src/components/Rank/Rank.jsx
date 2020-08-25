@@ -13,7 +13,6 @@ const Rank = ({ name, entries }) => {
     fetch(`https://9cfiqvzcfl.execute-api.us-east-1.amazonaws.com/dev/rank?rank=${entries}`)
       .then(resp => resp.json())
       .then(data => {
-        console.log(`got data`, data);
         setEmoji(data.input)
       })
       .catch(console.log)
