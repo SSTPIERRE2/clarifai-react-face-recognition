@@ -1,5 +1,5 @@
 export const API_URL =
-  process.env.REACT_APP_NODE_ENV === 'production'
+  process.env.NODE_ENV === 'production'
     ? 'https://smart-brains-clarifai-api.herokuapp.com/'
     : 'http://localhost:3000';
 
