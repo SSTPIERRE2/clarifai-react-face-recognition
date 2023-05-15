@@ -1,5 +1,7 @@
-export const API_URL = 'https://smart-brains-clarifai-api.herokuapp.com/';
-export const LOCAL_API_URL = 'http://localhost:3000';
+export const API_URL =
+  process.env === 'production'
+    ? 'https://smart-brains-clarifai-api.herokuapp.com/'
+    : 'http://localhost:3000';
 
 const makeRequestHeaders = (token) => {
   const headers = {
